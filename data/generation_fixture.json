@@ -1,0 +1,61 @@
+{
+  "Q01": [
+    {
+      "id": "R_Q01",
+      "text": "Pour un enfant scolarisé au collège, la Prime de Rentrée Numérique s'élève à 210 €. Elle est versée automatiquement fin août aux familles déjà bénéficiaires d'une prestation familiale."
+    }
+  ],
+  "Q02": [
+    {
+      "id": "R_Q02_v1",
+      "text": "Non, à 27 ans vous ne pouvez pas bénéficier de l'ALES : elle est réservée aux étudiants de moins de 26 ans au 1er septembre. Si vous êtes en situation de handicap, la limite d'âge est toutefois portée à 30 ans."
+    },
+    {
+      "id": "R_Q02_v2",
+      "text": "Non, l'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre de l'année universitaire."
+    }
+  ],
+  "Q03": [
+    {
+      "id": "R_Q03_partiel",
+      "text": "Avec des ressources de 1 900 € par mois, vous êtes en tranche 2 du barème : le Complément Garde Petite Enfance est de 310 € par mois pour votre enfant gardé par une assistante maternelle."
+    },
+    {
+      "id": "R_Q03_complet",
+      "requires": [
+        "MAJO#0"
+      ],
+      "text": "Avec 1 900 € par mois, vous êtes en tranche 2, soit 310 € par mois. Comme vous élevez seul votre enfant, ce montant est majoré de 30 % : vous percevrez 403 € par mois."
+    }
+  ],
+  "Q04": [
+    {
+      "id": "R_Q04",
+      "text": "L'Allocation Soutien Aidant est de 68,50 € par jour, dans la limite de 22 jours par mois. Elle est cumulable avec la Prime de Rentrée Numérique."
+    }
+  ],
+  "Q05": [
+    {
+      "id": "R_Q05",
+      "text": "Je ne dispose pas d'information sur la déclaration des revenus fonciers dans la documentation à ma disposition. Pour cette question, je vous invite à contacter l'administration fiscale."
+    }
+  ],
+  "Q06": [
+    {
+      "id": "R_Q06",
+      "text": "Je ne sais pas. Je n'ai pas trouvé cette information dans les documents à ma disposition."
+    }
+  ],
+  "Q07": [
+    {
+      "id": "R_Q07",
+      "text": "Oui, une reprise d'emploi à temps partiel doit être déclarée dans le mois qui suit, depuis votre espace personnel en ligne, car elle peut modifier le montant de vos aides. Pensez aussi à déclarer votre nouvelle adresse dans le mois si vous déménagez."
+    }
+  ],
+  "Q08": [
+    {
+      "id": "R_Q08",
+      "text": "Pour bénéficier de l'ALES, vos ressources annuelles ne doivent pas dépasser 18 000 €."
+    }
+  ]
+}

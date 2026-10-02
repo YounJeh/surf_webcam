@@ -1,0 +1,804 @@
+{
+  "texts": {
+    "R_Q01": {
+      "text": "Pour un enfant scolarisé au collège, la Prime de Rentrée Numérique s'élève à 210 €. Elle est versée automatiquement fin août aux familles déjà bénéficiaires d'une prestation familiale.",
+      "statements": [
+        {
+          "s": "La Prime de Rentrée Numérique s'élève à 210 € pour un enfant scolarisé au collège.",
+          "supported_by": [
+            "PRN#0"
+          ]
+        },
+        {
+          "s": "La Prime de Rentrée Numérique est versée automatiquement fin août.",
+          "supported_by": [
+            "PRN#0"
+          ]
+        },
+        {
+          "s": "La Prime de Rentrée Numérique est versée aux familles déjà bénéficiaires d'une prestation familiale.",
+          "supported_by": [
+            "PRN#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le montant de la Prime de Rentrée Numérique pour un collégien ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien vaut la Prime de Rentrée Numérique au collège ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quand la Prime de Rentrée Numérique est-elle versée ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "REF_Q01": {
+      "text": "210 € par enfant scolarisé au collège. La prime est versée automatiquement fin août.",
+      "statements": [
+        {
+          "s": "La prime est de 210 € par enfant scolarisé au collège.",
+          "supported_by": [
+            "PRN#0"
+          ]
+        },
+        {
+          "s": "La prime est versée automatiquement fin août.",
+          "supported_by": [
+            "PRN#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le montant de la prime pour un enfant au collège ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quand la prime de rentrée est-elle versée ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien touche-t-on par enfant au collège ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q02_v1": {
+      "text": "Non, à 27 ans vous ne pouvez pas bénéficier de l'ALES : elle est réservée aux étudiants de moins de 26 ans au 1er septembre. Si vous êtes en situation de handicap, la limite d'âge est toutefois portée à 30 ans.",
+      "statements": [
+        {
+          "s": "Un étudiant de 27 ans ne peut pas bénéficier de l'ALES.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        },
+        {
+          "s": "L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        },
+        {
+          "s": "Pour un étudiant en situation de handicap, la limite d'âge de l'ALES est portée à 30 ans.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Un étudiant de 27 ans peut-il bénéficier de l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quelle est la limite d'âge pour l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "La limite d'âge de l'ALES est-elle différente pour un étudiant handicapé ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q02_v2": {
+      "text": "Non, l'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre de l'année universitaire.",
+      "statements": [
+        {
+          "s": "L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre de l'année universitaire.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        },
+        {
+          "s": "Un étudiant de 27 ans ne peut pas bénéficier de l'ALES.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quelle est la limite d'âge pour bénéficier de l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Un étudiant de 27 ans a-t-il droit à l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "À qui l'ALES est-elle réservée ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "REF_Q02": {
+      "text": "Non. L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre. Exception : pour un étudiant en situation de handicap, la limite est portée à 30 ans.",
+      "statements": [
+        {
+          "s": "L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        },
+        {
+          "s": "Pour un étudiant en situation de handicap, la limite d'âge de l'ALES est portée à 30 ans.",
+          "supported_by": [
+            "ALES#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Un étudiant de 27 ans peut-il avoir l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quelle est la limite d'âge de l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Existe-t-il une exception à la limite d'âge de l'ALES ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q03_partiel": {
+      "text": "Avec des ressources de 1 900 € par mois, vous êtes en tranche 2 du barème : le Complément Garde Petite Enfance est de 310 € par mois pour votre enfant gardé par une assistante maternelle.",
+      "statements": [
+        {
+          "s": "Avec 1 900 € de ressources mensuelles, on relève de la tranche 2 du CGPE.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        },
+        {
+          "s": "En tranche 2, le CGPE est de 310 € par mois.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le montant du CGPE en tranche 2 ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien touche-t-on de CGPE avec 1 900 € de ressources par mois ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Dans quelle tranche du barème CGPE se situe un revenu de 1 900 € ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q03_complet": {
+      "text": "Avec 1 900 € par mois, vous êtes en tranche 2, soit 310 € par mois. Comme vous élevez seul votre enfant, ce montant est majoré de 30 % : vous percevrez 403 € par mois.",
+      "statements": [
+        {
+          "s": "Avec 1 900 € de ressources mensuelles, on relève de la tranche 2 du CGPE.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        },
+        {
+          "s": "En tranche 2, le CGPE est de 310 € par mois.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        },
+        {
+          "s": "Pour un parent isolé, le montant du CGPE est majoré de 30 %.",
+          "supported_by": [
+            "MAJO#0"
+          ]
+        },
+        {
+          "s": "Un parent isolé en tranche 2 perçoit 403 € par mois de CGPE.",
+          "supported_by": [
+            "CGPE#0",
+            "MAJO#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Combien touche un parent isolé en tranche 2 du CGPE ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Le CGPE est-il majoré pour un parent isolé ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quel est le montant du CGPE avec 1 900 € par mois pour un parent seul ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "REF_Q03": {
+      "text": "Avec 1 900 € de ressources mensuelles, vous relevez de la tranche 2 du CGPE, soit 310 € par mois. En tant que parent isolé, ce montant est majoré de 30 % : vous percevrez 403 € par mois.",
+      "statements": [
+        {
+          "s": "Un revenu mensuel de 1 900 € correspond à la tranche 2 du CGPE.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        },
+        {
+          "s": "Le CGPE en tranche 2 est de 310 € par mois.",
+          "supported_by": [
+            "CGPE#0"
+          ]
+        },
+        {
+          "s": "Le CGPE est majoré de 30 % pour un parent isolé.",
+          "supported_by": [
+            "MAJO#0"
+          ]
+        },
+        {
+          "s": "Le parent isolé percevra 403 € par mois.",
+          "supported_by": [
+            "CGPE#0",
+            "MAJO#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Combien un parent isolé touche-t-il de CGPE avec 1 900 € par mois ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quel est le montant du CGPE majoré pour un parent isolé ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Dans quelle tranche du CGPE se situe un revenu de 1 900 € ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q04": {
+      "text": "L'Allocation Soutien Aidant est de 68,50 € par jour, dans la limite de 22 jours par mois. Elle est cumulable avec la Prime de Rentrée Numérique.",
+      "statements": [
+        {
+          "s": "L'Allocation Soutien Aidant est de 68,50 € par jour.",
+          "supported_by": []
+        },
+        {
+          "s": "L'Allocation Soutien Aidant est versée dans la limite de 22 jours par mois.",
+          "supported_by": [
+            "ASA#0"
+          ]
+        },
+        {
+          "s": "L'Allocation Soutien Aidant est cumulable avec la Prime de Rentrée Numérique.",
+          "supported_by": []
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le montant journalier de l'Allocation Soutien Aidant ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien de jours par mois l'Allocation Soutien Aidant peut-elle être versée ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "L'Allocation Soutien Aidant est-elle cumulable avec la Prime de Rentrée Numérique ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "REF_Q04": {
+      "text": "L'ASA est de 64,20 € par journée d'aide (32,10 € par demi-journée), dans la limite de 22 jours par mois.",
+      "statements": [
+        {
+          "s": "L'ASA est de 64,20 € par journée d'aide.",
+          "supported_by": [
+            "ASA#0"
+          ]
+        },
+        {
+          "s": "L'ASA est de 32,10 € par demi-journée.",
+          "supported_by": [
+            "ASA#0"
+          ]
+        },
+        {
+          "s": "L'ASA est versée dans la limite de 22 jours par mois.",
+          "supported_by": [
+            "ASA#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le montant de l'ASA par journée d'aide ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien vaut l'ASA pour une demi-journée ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Combien de jours d'ASA peut-on percevoir par mois ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q05": {
+      "text": "Je ne dispose pas d'information sur la déclaration des revenus fonciers dans la documentation à ma disposition. Pour cette question, je vous invite à contacter l'administration fiscale.",
+      "statements": [
+        {
+          "s": "La documentation ne contient pas d'information sur la déclaration des revenus fonciers.",
+          "supported_by": []
+        },
+        {
+          "s": "Pour la déclaration des revenus fonciers, il faut contacter l'administration fiscale.",
+          "supported_by": []
+        }
+      ],
+      "questions": [
+        {
+          "q": "Où trouver de l'information sur la déclaration des revenus fonciers ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "Qui contacter pour déclarer des revenus fonciers ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "La documentation traite-t-elle des revenus fonciers ?",
+          "noncommittal": 1
+        }
+      ]
+    },
+    "REF_Q05": {
+      "text": "Cette question ne relève pas des prestations couvertes par la documentation. L'assistant doit indiquer qu'il ne peut pas répondre et orienter vers l'administration fiscale.",
+      "statements": [
+        {
+          "s": "La question ne relève pas des prestations couvertes par la documentation.",
+          "supported_by": []
+        },
+        {
+          "s": "L'assistant doit orienter vers l'administration fiscale.",
+          "supported_by": []
+        }
+      ],
+      "questions": [
+        {
+          "q": "Vers qui orienter une question fiscale ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "Cette question relève-t-elle des prestations couvertes ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "Que doit faire l'assistant face à une question hors périmètre ?",
+          "noncommittal": 1
+        }
+      ]
+    },
+    "R_Q06": {
+      "text": "Je ne sais pas. Je n'ai pas trouvé cette information dans les documents à ma disposition.",
+      "statements": [],
+      "questions": [
+        {
+          "q": "Quelle information l'assistant n'a-t-il pas trouvée ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "L'assistant connaît-il la réponse ?",
+          "noncommittal": 1
+        },
+        {
+          "q": "Que disent les documents ?",
+          "noncommittal": 1
+        }
+      ]
+    },
+    "REF_Q06": {
+      "text": "Après la déclaration d'un changement de situation, les droits sont recalculés et le nouveau montant est versé le mois suivant, au plus tard sous 30 jours.",
+      "statements": [
+        {
+          "s": "Après une déclaration de changement de situation, les droits sont recalculés.",
+          "supported_by": [
+            "DELAI#1"
+          ]
+        },
+        {
+          "s": "Le nouveau montant est versé le mois suivant la déclaration.",
+          "supported_by": [
+            "DELAI#1"
+          ]
+        },
+        {
+          "s": "Le nouveau montant est versé au plus tard sous 30 jours.",
+          "supported_by": [
+            "DELAI#1"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Dans quel délai le nouveau montant est-il versé après un changement de situation ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Que se passe-t-il après la déclaration d'un changement de situation ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quel est le délai maximum de versement après un changement de situation ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q07": {
+      "text": "Oui, une reprise d'emploi à temps partiel doit être déclarée dans le mois qui suit, depuis votre espace personnel en ligne, car elle peut modifier le montant de vos aides. Pensez aussi à déclarer votre nouvelle adresse dans le mois si vous déménagez.",
+      "statements": [
+        {
+          "s": "Une reprise d'emploi à temps partiel doit être déclarée dans le mois qui suit.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        },
+        {
+          "s": "La déclaration se fait depuis l'espace personnel en ligne.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        },
+        {
+          "s": "Une reprise d'emploi peut modifier le montant des aides.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        },
+        {
+          "s": "En cas de déménagement, la nouvelle adresse doit être déclarée dans le mois.",
+          "supported_by": [
+            "SITU#1"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Faut-il déclarer une reprise d'emploi à temps partiel ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Dans quel délai déclarer une reprise d'emploi ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Faut-il déclarer un déménagement ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "REF_Q07": {
+      "text": "Oui. Une reprise d'emploi, même à temps partiel, est un changement de situation professionnelle à déclarer dans le mois depuis l'espace personnel. Elle peut modifier le montant des aides.",
+      "statements": [
+        {
+          "s": "Une reprise d'emploi, même à temps partiel, doit être déclarée.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        },
+        {
+          "s": "La déclaration doit être faite dans le mois depuis l'espace personnel.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        },
+        {
+          "s": "Une reprise d'emploi peut modifier le montant des aides.",
+          "supported_by": [
+            "SITU#0"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Doit-on déclarer une reprise d'emploi à temps partiel ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Comment déclarer une reprise d'emploi ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Une reprise d'emploi modifie-t-elle le montant des aides ?",
+          "noncommittal": 0
+        }
+      ]
+    },
+    "R_Q08": {
+      "text": "Pour bénéficier de l'ALES, vos ressources annuelles ne doivent pas dépasser 18 000 €.",
+      "statements": [
+        {
+          "s": "Pour bénéficier de l'ALES, les ressources annuelles ne doivent pas dépasser 18 000 €.",
+          "supported_by": [
+            "ALES#1"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "q": "Quel est le plafond de ressources de l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "Quelles ressources maximum pour bénéficier de l'ALES ?",
+          "noncommittal": 0
+        },
+        {
+          "q": "L'ALES est-elle soumise à conditions de ressources ?",
+          "noncommittal": 0
+        }
+      ]
+    }
+  },
+  "items": {
+    "Q01": {
+      "useful_chunks": [
+        "PRN#0"
+      ],
+      "relevant_chunks": [
+        "PRN#0"
+      ],
+      "question": "Quel est le montant de la Prime de Rentrée Numérique pour un enfant au collège ?"
+    },
+    "Q02": {
+      "useful_chunks": [
+        "ALES#0"
+      ],
+      "relevant_chunks": [
+        "ALES#0"
+      ],
+      "question": "J'ai 27 ans et je suis étudiant, est-ce que je peux avoir l'ALES ?"
+    },
+    "Q03": {
+      "useful_chunks": [
+        "CGPE#0",
+        "MAJO#0"
+      ],
+      "relevant_chunks": [
+        "CGPE#0",
+        "MAJO#0"
+      ],
+      "question": "Je suis parent isolé, mon fils de 2 ans est gardé par une assistante maternelle et je gagne 1 900 € par mois. Combien vais-je toucher au titre du CGPE ?"
+    },
+    "Q04": {
+      "useful_chunks": [
+        "ASA#0"
+      ],
+      "relevant_chunks": [
+        "ASA#0"
+      ],
+      "question": "Quel est le montant journalier de l'Allocation Soutien Aidant ?"
+    },
+    "Q05": {
+      "useful_chunks": [],
+      "relevant_chunks": [],
+      "question": "Comment déclarer mes revenus fonciers sur ma déclaration d'impôt ?"
+    },
+    "Q06": {
+      "useful_chunks": [
+        "DELAI#1"
+      ],
+      "relevant_chunks": [
+        "DELAI#1"
+      ],
+      "question": "Après avoir déclaré un changement de situation, dans quel délai le nouveau montant est-il versé ?"
+    },
+    "Q07": {
+      "useful_chunks": [
+        "SITU#0",
+        "SITU#1",
+        "DELAI#1"
+      ],
+      "relevant_chunks": [
+        "SITU#0"
+      ],
+      "question": "Je reprends un emploi à temps partiel, est-ce que je dois le déclarer ?"
+    },
+    "Q08": {
+      "useful_chunks": [
+        "ALES#1"
+      ],
+      "relevant_chunks": [
+        "ALES#1"
+      ],
+      "question": "Quel est le plafond de ressources pour l'ALES ?"
+    }
+  },
+  "correctness": [
+    {
+      "response": "R_Q01",
+      "reference": "REF_Q01",
+      "TP": [
+        "La Prime de Rentrée Numérique s'élève à 210 € pour un enfant scolarisé au collège.",
+        "La Prime de Rentrée Numérique est versée automatiquement fin août."
+      ],
+      "FP": [
+        "La Prime de Rentrée Numérique est versée aux familles déjà bénéficiaires d'une prestation familiale."
+      ],
+      "FN": []
+    },
+    {
+      "response": "R_Q02_v1",
+      "reference": "REF_Q02",
+      "TP": [
+        "Un étudiant de 27 ans ne peut pas bénéficier de l'ALES.",
+        "L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre.",
+        "Pour un étudiant en situation de handicap, la limite d'âge de l'ALES est portée à 30 ans."
+      ],
+      "FP": [],
+      "FN": []
+    },
+    {
+      "response": "R_Q02_v2",
+      "reference": "REF_Q02",
+      "TP": [
+        "L'ALES est réservée aux étudiants de moins de 26 ans au 1er septembre de l'année universitaire.",
+        "Un étudiant de 27 ans ne peut pas bénéficier de l'ALES."
+      ],
+      "FP": [],
+      "FN": [
+        "Pour un étudiant en situation de handicap, la limite d'âge de l'ALES est portée à 30 ans."
+      ]
+    },
+    {
+      "response": "R_Q03_partiel",
+      "reference": "REF_Q03",
+      "TP": [
+        "Avec 1 900 € de ressources mensuelles, on relève de la tranche 2 du CGPE.",
+        "En tranche 2, le CGPE est de 310 € par mois."
+      ],
+      "FP": [],
+      "FN": [
+        "Le CGPE est majoré de 30 % pour un parent isolé.",
+        "Le parent isolé percevra 403 € par mois."
+      ]
+    },
+    {
+      "response": "R_Q03_complet",
+      "reference": "REF_Q03",
+      "TP": [
+        "Avec 1 900 € de ressources mensuelles, on relève de la tranche 2 du CGPE.",
+        "En tranche 2, le CGPE est de 310 € par mois.",
+        "Pour un parent isolé, le montant du CGPE est majoré de 30 %.",
+        "Un parent isolé en tranche 2 perçoit 403 € par mois de CGPE."
+      ],
+      "FP": [],
+      "FN": []
+    },
+    {
+      "response": "R_Q04",
+      "reference": "REF_Q04",
+      "TP": [
+        "L'Allocation Soutien Aidant est versée dans la limite de 22 jours par mois."
+      ],
+      "FP": [
+        "L'Allocation Soutien Aidant est de 68,50 € par jour.",
+        "L'Allocation Soutien Aidant est cumulable avec la Prime de Rentrée Numérique."
+      ],
+      "FN": [
+        "L'ASA est de 64,20 € par journée d'aide.",
+        "L'ASA est de 32,10 € par demi-journée."
+      ]
+    },
+    {
+      "response": "R_Q05",
+      "reference": "REF_Q05",
+      "TP": [
+        "La documentation ne contient pas d'information sur la déclaration des revenus fonciers.",
+        "Pour la déclaration des revenus fonciers, il faut contacter l'administration fiscale."
+      ],
+      "FP": [],
+      "FN": []
+    },
+    {
+      "response": "R_Q07",
+      "reference": "REF_Q07",
+      "TP": [
+        "Une reprise d'emploi à temps partiel doit être déclarée dans le mois qui suit.",
+        "La déclaration se fait depuis l'espace personnel en ligne.",
+        "Une reprise d'emploi peut modifier le montant des aides."
+      ],
+      "FP": [
+        "En cas de déménagement, la nouvelle adresse doit être déclarée dans le mois."
+      ],
+      "FN": []
+    }
+  ],
+  "accuracy": [
+    {
+      "response": "R_Q01",
+      "reference": "REF_Q01",
+      "judge1": 4,
+      "judge2": 4
+    },
+    {
+      "response": "R_Q02_v1",
+      "reference": "REF_Q02",
+      "judge1": 4,
+      "judge2": 4
+    },
+    {
+      "response": "R_Q02_v2",
+      "reference": "REF_Q02",
+      "judge1": 2,
+      "judge2": 2
+    },
+    {
+      "response": "R_Q03_partiel",
+      "reference": "REF_Q03",
+      "judge1": 2,
+      "judge2": 0
+    },
+    {
+      "response": "R_Q03_complet",
+      "reference": "REF_Q03",
+      "judge1": 4,
+      "judge2": 4
+    },
+    {
+      "response": "R_Q04",
+      "reference": "REF_Q04",
+      "judge1": 0,
+      "judge2": 2
+    },
+    {
+      "response": "R_Q05",
+      "reference": "REF_Q05",
+      "judge1": 4,
+      "judge2": 4
+    },
+    {
+      "response": "R_Q06",
+      "reference": "REF_Q06",
+      "judge1": 0,
+      "judge2": 0
+    },
+    {
+      "response": "R_Q07",
+      "reference": "REF_Q07",
+      "judge1": 4,
+      "judge2": 2
+    }
+  ]
+}
