@@ -1,0 +1,104 @@
+{
+  "name": "rag-demo-eval-embedding_max_semantic_0-2026-10-02T13:27:51.910977",
+  "description": "Évaluation RAG base_documentaire | embed_model=embed-demo-v1 | chunk_size/overlap=2000/300 | top_k=10 | nb_db_results=20 | hybrid=True | neighbor_chunks=0 | rerank=True | reranker_model=rerank-demo-v1 | response_model=llm-demo-instruct | response_temperature=0.2 | multiquery_nb_variants=0",
+  "metadata": {
+    "source": "base_documentaire",
+    "rag_config": {
+      "database": {
+        "pg_database": "embedding_demo",
+        "vector_size": 1024
+      },
+      "embedding": {
+        "server": "http://embedding-stub.local",
+        "default_model": "embed-demo-v1",
+        "batch_size": 16,
+        "chunk_size": 2000,
+        "chunk_overlap": 300,
+        "top_k": 5,
+        "timeout": 30,
+        "tolower": true,
+        "purge_delay": 30
+      },
+      "glossaire": {
+        "glossaire_path": 0
+      },
+      "embedding_source": {
+        "default_model": "embed-demo-v1",
+        "chunk_size": 2000,
+        "chunk_overlap": 300,
+        "top_k": 10
+      },
+      "retriever": {
+        "nb_db_results": 20,
+        "rrf_min_results": 30,
+        "rrf_max_results": 50,
+        "use_reranking": true,
+        "mmr_lambda": 0.8,
+        "nb_results": 5,
+        "max_semantic_distance": 0,
+        "neighbor_chunks": 0,
+        "use_hybrid_retrieval": true,
+        "lexical_db_results": 20,
+        "lexical_trigram_threshold": 0.15,
+        "lexical_fts_weight": 1.0,
+        "lexical_trigram_weight": 0.4
+      },
+      "multiquery": {
+        "server": "http://llm-stub.local",
+        "default_model": "llm-demo-instruct",
+        "timeout": 30,
+        "temperature": 0.0,
+        "top_p": 0.9,
+        "nb_variants": 0
+      },
+      "reranking": {
+        "server": "http://reranker-stub.local",
+        "default_model": "rerank-demo-v1",
+        "batch_size": 16,
+        "timeout": 30,
+        "score_minimum": 0.0
+      },
+      "response": {
+        "server": "http://llm-stub.local",
+        "default_model": "llm-demo-instruct",
+        "timeout": 60,
+        "temperature": 0.2,
+        "history_size": 0
+      }
+    }
+  },
+  "dataset_run_items": [
+    {
+      "dataset_item_id": "item-001",
+      "trace_id": "508076429f3e45fe80e7bf5298f3464c"
+    },
+    {
+      "dataset_item_id": "item-002",
+      "trace_id": "8fa35a9d373b487a980ee7aa2eb0aca6"
+    },
+    {
+      "dataset_item_id": "item-003",
+      "trace_id": "c5f233bb2fde499e8682ed477f130907"
+    },
+    {
+      "dataset_item_id": "item-004",
+      "trace_id": "928d6b68806a423c91b7520a9539fe11"
+    },
+    {
+      "dataset_item_id": "item-005",
+      "trace_id": "1d63b662010e4217b9b27c22bd2071b2"
+    },
+    {
+      "dataset_item_id": "item-006",
+      "trace_id": "a915160933384e9799b889b97d6e179d"
+    },
+    {
+      "dataset_item_id": "item-007",
+      "trace_id": "1bb3b92229fa4e0fb127ef0f77042d4e"
+    },
+    {
+      "dataset_item_id": "item-008",
+      "trace_id": "ad70efaa109944918a03705a1baf725a"
+    }
+  ]
+}

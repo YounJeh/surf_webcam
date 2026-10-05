@@ -1,0 +1,28 @@
+📦 [13:27:51] Dataset 'golden_set_demo' chargé (8 lignes)
+🔧 [13:27:51] Services Retriever + ResponseGenerator initialisés
+🛠️ [13:27:51] Initialisation des clients RAGAS
+✅ [13:27:51] Clients RAGAS LLM + embeddings initialisés
+📏 [13:27:51] Métriques RAGAS initialisées (mode=fast, n=4)
+🏁 [13:27:51] Début du run 'rag-demo-eval-embedding_max_semantic_0' | rows=8 | mode=fast | rows_concurrency=4 | metrics_concurrency=2
+🚦 [13:27:51] Lancement batch rows 1 à 4 (4 tâches)
+🚀 [13:27:51] [row 001] START
+🚀 [13:27:51] [row 002] START
+🚀 [13:27:51] [row 003] START
+🚀 [13:27:51] [row 004] START
+✅ [13:27:51] [row 001] OK | ctx=5 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 002] OK | ctx=5 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 003] OK | ctx=3 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 004] OK | ctx=4 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+📌 [13:27:51] Fin batch | progression 4/8 | success=4 | errors=0
+🚦 [13:27:51] Lancement batch rows 5 à 8 (4 tâches)
+🚀 [13:27:51] [row 005] START
+🚀 [13:27:51] [row 006] START
+🚀 [13:27:51] [row 007] START
+🚀 [13:27:51] [row 008] START
+✅ [13:27:51] [row 005] OK | ctx=1 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 006] OK | ctx=5 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 007] OK | ctx=5 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+✅ [13:27:51] [row 008] OK | ctx=4 | retrieve=0.0s | generate=0.0s | score=0.0s | total=0.0s
+📌 [13:27:51] Fin batch | progression 8/8 | success=8 | errors=0
+🏁 [13:27:51] Run terminé en 0.0s
+[stub-langfuse] run enregistré : rag-demo-eval-embedding_max_semantic_0-2026-10-02T13:27:51.910977 -> /workspaces/surf_webcam/out/langfuse/runs/rag-demo-eval-embedding_max_semantic_0-2026-10-02T13_27_51.910977.json

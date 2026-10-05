@@ -1,0 +1,106 @@
+{
+  "id": "b0449b57007144b4bfcaeb62eab027c1",
+  "name": "dataset-run:rag-demo-eval-embedding_max_semantic_2-2026-10-02T13:27:51.948227",
+  "metadata": {
+    "source": "base_documentaire",
+    "rag_config": {
+      "database": {
+        "pg_database": "embedding_demo",
+        "vector_size": 1024
+      },
+      "embedding": {
+        "server": "http://embedding-stub.local",
+        "default_model": "embed-demo-v1",
+        "batch_size": 16,
+        "chunk_size": 2000,
+        "chunk_overlap": 300,
+        "top_k": 5,
+        "timeout": 30,
+        "tolower": true,
+        "purge_delay": 30
+      },
+      "glossaire": {
+        "glossaire_path": 0
+      },
+      "embedding_source": {
+        "default_model": "embed-demo-v1",
+        "chunk_size": 2000,
+        "chunk_overlap": 300,
+        "top_k": 10
+      },
+      "retriever": {
+        "nb_db_results": 20,
+        "rrf_min_results": 30,
+        "rrf_max_results": 50,
+        "use_reranking": true,
+        "mmr_lambda": 0.8,
+        "nb_results": 5,
+        "max_semantic_distance": 0,
+        "neighbor_chunks": 0,
+        "use_hybrid_retrieval": true,
+        "lexical_db_results": 20,
+        "lexical_trigram_threshold": 0.15,
+        "lexical_fts_weight": 1.0,
+        "lexical_trigram_weight": 0.4
+      },
+      "multiquery": {
+        "server": "http://llm-stub.local",
+        "default_model": "llm-demo-instruct",
+        "timeout": 30,
+        "temperature": 0.0,
+        "top_p": 0.9,
+        "nb_variants": 0
+      },
+      "reranking": {
+        "server": "http://reranker-stub.local",
+        "default_model": "rerank-demo-v1",
+        "batch_size": 16,
+        "timeout": 30,
+        "score_minimum": 0.0
+      },
+      "response": {
+        "server": "http://llm-stub.local",
+        "default_model": "llm-demo-instruct",
+        "timeout": 60,
+        "temperature": 0.2,
+        "history_size": 0
+      }
+    }
+  },
+  "scores": [
+    {
+      "name": "context_relevance",
+      "value": 1.0,
+      "data_type": "NUMERIC"
+    },
+    {
+      "name": "context_recall",
+      "value": 1.0,
+      "data_type": "NUMERIC"
+    },
+    {
+      "name": "answer_accuracy",
+      "value": 1.0,
+      "data_type": "NUMERIC"
+    },
+    {
+      "name": "response_groundedness",
+      "value": 1.0,
+      "data_type": "NUMERIC"
+    },
+    {
+      "name": "nb_error",
+      "value": 0,
+      "data_type": "NUMERIC"
+    }
+  ],
+  "observations": [],
+  "updates": [
+    {
+      "input": "Quel est le montant de la Prime de Rentrée Numérique pour un enfant au collège ?",
+      "output": "Pour un enfant scolarisé au collège, la Prime de Rentrée Numérique s'élève à 210 €. Elle est versée automatiquement fin août aux familles déjà bénéficiaires d'une prestation familiale."
+    }
+  ],
+  "input": "Quel est le montant de la Prime de Rentrée Numérique pour un enfant au collège ?",
+  "output": "Pour un enfant scolarisé au collège, la Prime de Rentrée Numérique s'élève à 210 €. Elle est versée automatiquement fin août aux familles déjà bénéficiaires d'une prestation familiale."
+}
