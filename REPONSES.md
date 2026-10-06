@@ -44,20 +44,22 @@ Exemples : Q04 répond bien à la question mais invente le montant → bonne rel
 
 ### B1. Problèmes relevés
 
-**1. `response` et `reference` inversés — bloquant.**
+**1. `response` et `reference` inversés**
+
+
 `run_eval.py:72` appelle `score_with_ragas(..., expected_response, response)` alors que la signature (`ragas_metrics.py:95`) attend `(..., response, reference)`. Toutes les métriques sauf ContextRelevance reçoivent le mauvais texte : la faithfulness note la référence, le recall juge le contexte par rapport à la réponse générée. Q04 : faithfulness = 1.000 sur une réponse hallucinée (≈ 0.33 attendu, cf. C1).
 
-**2. ContextPrecision ne suit pas ragas — bloquant.**
+**2. ContextPrecision ne suit pas ragas**
+
+
 `collections.py:300` divise par le nombre de chunks au lieu du nombre de chunks pertinents. Q04, verdicts [1, 0, 0, 0] : 0.25 au lieu de 1.0, alors que le seul chunk utile est classé premier. Le score baisse dès qu'on récupère plus de chunks, ce qui biaise tout réglage du retriever.
 
-**3. `nan` et référence vide mal gérés — important.**
+**3. `nan` et référence vide mal gérés.**
 - `run_eval.py:76` ne filtre que `None`, et `run_report.py:178` moyenne les `nan` : la moyenne de context_recall vaut `nan` sur les 3 runs du sweep (à cause de Q06).
 - `run_eval.py:41` fait `str(item.expected_output)` : une référence vide devient le texte `"None"`, qui passe le garde-fou `if not reference`. Q08 est noté contre "None" au lieu d'être exclu.
 
-Autres points, plus brièvement :
-- le juge est le même LLM que le générateur (`ragas_metrics.py:33-34`) : biais d'auto-évaluation ;
-- `max_semantic_distance` est lu avec `get_int` (`utils.py`) : il vaut 0 dans les métadonnées des 3 runs du sweep ;
-- les chunks attendus (`expected_retrieved_context`) sont exigés à l'import puis jetés (`dataset_import.py:94`).
+**4. `max_semantic_distance` lu avec `get_int`**
+- `max_semantic_distance` est lu avec `get_int` (`utils.py`) : il vaut 0 dans les métadonnées des 3 runs du sweep .
 
 ### B2. Confiance dans le sweep
 
@@ -70,7 +72,7 @@ Non.
 ### B3. Lancement via l'API
 
 `config_path` et `config_overrides` viennent du client sans validation ni authentification (`api_models.py:13-14`, `evaluation_router.py:18`). Un appelant peut rediriger `[Response] SERVER` vers son propre serveur : il reçoit les chunks de la documentation interne et la clé d'API, et peut renvoyer de fausses notes.
-Correction : liste blanche des paramètres modifiables (`[Retriever]`), URL et modèles non surchargeables, authentification.
+Correction : liste blanche des paramètres modifiables (`[Retriever]`), URL et modèles non surchargeables.
 
 ---
 
@@ -154,7 +156,7 @@ def test_context_precision():
 
 Ils recoupent nos constats : SITU#1 hors sujet (Q07), « le bon montant est là, c'est la réponse qui est fausse » (Q04), « il manque la circulaire majoration » (Q03).
 
-- **Usage** : retrouver la question via `message_id`, faire juger le même chunk par le juge, mesurer l'accord (kappa de Cohen) ; transformer les retours négatifs en nouveaux items du golden dataset.
+- **Usage** : retrouver la question via `message_id`, faire juger le même chunk par le juge, mesurer l'accord ; transformer les retours négatifs en nouveaux items du golden dataset.
 - **Difficultés** : étiquettes non normalisées (`non_pertinent`, `NON PERTINENT`, `bof`), doublon (lignes 6 et 7), `manquant` qui n'est pas un avis sur un chunk cité, biais de sélection (seuls les chunks cités sont notés, surtout quand ça va mal), volume trop faible.
 
 ### D4. Intégration
