@@ -1,58 +1,42 @@
-# Évaluation du RAG : réponses
-
-Les références au code sont données sous la forme `fichier:ligne`. Les identifiants Q01 à Q08 renvoient au tableau de `data/README.md`.
-
----
-
 ## A. Compréhension
 
-### A1. Flux d'un run d'évaluation
+### A1. Flux d'un run
 
-| # | Étape | Où | Entrée | Sortie |
-|---|---|---|---|---|
-| 1 | Import du dataset | `dataset_import.py:70` `import_rows` | ligne du golden dataset | item Langfuse : `input` = question, `expected_output` = réponse attendue (`expected_retrieved_context` n'est pas repris) |
-| 2 | Initialisation du run | `run_eval.py:135` `run_rag_with_ragas` | config .ini, mode `fast` / `full` | items, retriever, générateur, métriques (`build_metrics`), lancement des items par batchs de 4 |
-| 3 | Retrieval | `run_eval.py:59` `retrieve_chunks` | question | chunks filtrés (distance ≤ `MAX_SEMANTIC_DISTANCE`, au plus `NB_RESULTS`), puis `ctx_texts` |
-| 4 | Génération | `run_eval.py:64` `generate_response` | question + chunks | `response` |
-| 5 | Scoring | `run_eval.py:72` → `ragas_metrics.py:95` `score_with_ragas` | appel : `(prompt, ctx_texts, expected_response, response)` ; signature : `(query, chunks, response, reference)` | `{métrique: score}`, `None` si la métrique plante |
-| 6 | Envoi des scores | `run_eval.py:77` `score_trace` | scores | scores attachés à la trace de l'item, plus `nb_error` |
-| 7 | Persistance | `run_eval.py:235` `langfuse.flush()` | runs + traces | JSON dans `out/langfuse/` |
-| 8 | Rapport | `run_report.py:260` `main` | noms des runs et des scores | relit les traces (`_load_run_results`), garde les items communs, calcule moyenne / min / max par run, pires items, items qui diffèrent ; Markdown dans `out/reports/` |
-
-Deux niveaux de concurrence : les items (sémaphore + batchs, `run_eval.py:168-201`) et les métriques d'un même item (sémaphore, `ragas_metrics.py:101`).
-
-### A2. Les 4 métriques du mode `fast`
-
-| Métrique | Champs | Ce que produit le juge | Formule |
+| # | Étape | Où | Entrée → sortie |
 |---|---|---|---|
-| ContextRelevance (`collections.py:341`) | `user_input`, `retrieved_contexts` | 2 juges, une note parmi {0, 1, 2} : le contexte permet-il de répondre à la question ? | moyenne de `j1/2` et `j2/2` |
-| ContextRecall (`collections.py:311`) | `user_input`, `retrieved_contexts`, `reference` | 1 juge : découpe la référence en phrases, 1 ou 0 par phrase selon qu'elle est attribuable au contexte | phrases attribuées / nombre de phrases |
-| AnswerAccuracy (`collections.py:464`) | `user_input`, `response`, `reference` | 2 juges, une note parmi {0, 2, 4} ; le juge 2 inverse réponse et référence | moyenne de `j1/4` et `j2/4` |
-| ResponseGroundedness (`collections.py:236`) | `response`, `retrieved_contexts` | 2 juges, une note parmi {0, 1, 2} : la réponse est-elle ancrée dans le contexte ? | moyenne de `j1/2` et `j2/2` |
+| 1 | Import | `dataset_import.py:70` `import_rows` | ligne du golden dataset → item (`input`, `expected_output`) ; `expected_retrieved_context` n'est pas repris |
+| 2 | Lancement | `run_eval.py:135` `run_rag_with_ragas` | config + mode → services, métriques, items traités par batchs de 4 |
+| 3 | Retrieval | `run_eval.py:59` | question → chunks (distance ≤ `MAX_SEMANTIC_DISTANCE`, au plus `NB_RESULTS`) |
+| 4 | Génération | `run_eval.py:64` | question + chunks → `response` |
+| 5 | Scoring | `run_eval.py:72` → `ragas_metrics.py:95` | échantillon → `{métrique: score}` |
+| 6 | Envoi | `run_eval.py:77` `score_trace`, `:235` `flush` | scores → trace Langfuse de l'item |
+| 7 | Rapport | `run_report.py:260` | traces des runs → moyenne / min / max par run, items qui diffèrent (Markdown) |
 
-Tous les scores sont entre 0 et 1. Les deux juges d'une même métrique sont le même LLM avec deux formulations de prompt. Si un juge échoue (note hors liste 5 fois de suite), on garde l'autre ; si les deux échouent, le score vaut `nan` (`_average_scores`, `collections.py:117`). ContextRecall renvoie aussi `nan` si le juge ne classe aucune phrase.
+### A2. Métriques du mode `fast`
 
-### A3. Familles de métriques
+| Métrique | Champs | Juge | Score |
+|---|---|---|---|
+| ContextRelevance | `user_input`, `retrieved_contexts` | 2 juges, note {0, 1, 2} | moyenne de `j1/2` et `j2/2` |
+| ContextRecall | `user_input`, `retrieved_contexts`, `reference` | 1 juge, 1/0 par phrase de la référence attribuable au contexte | phrases attribuées / total |
+| AnswerAccuracy | `user_input`, `response`, `reference` | 2 juges, note {0, 2, 4}, le juge 2 inverse réponse et référence | moyenne de `j1/4` et `j2/4` |
+| ResponseGroundedness | `response`, `retrieved_contexts` | 2 juges, note {0, 1, 2} | moyenne de `j1/2` et `j2/2` |
 
-| Famille | Métriques |
-|---|---|
-| Retrieval | ContextPrecision, ContextRecall, ContextRelevance |
-| Génération | Faithfulness, ResponseGroundedness, AnswerRelevancy |
-| Bout-en-bout | AnswerCorrectness, AnswerAccuracy |
+Si un juge échoue, on garde l'autre ; si les deux échouent, `nan` (`collections.py:117`).
 
-Besoin d'une référence (`reference` dans `ascore`) : ContextPrecision, ContextRecall, AnswerCorrectness, AnswerAccuracy. Les 4 autres peuvent tourner sans golden dataset, donc aussi en production.
+### A3. Familles
 
-À noter : ContextPrecision et ContextRecall jugent le retrieval par rapport à la réponse de référence (texte), pas par rapport aux chunks attendus (`expected_retrieved_context`), qui ne sont jamais importés (`dataset_import.py:94`).
+- **Retrieval** : ContextPrecision, ContextRecall, ContextRelevance.
+- **Génération** : Faithfulness, ResponseGroundedness, AnswerRelevancy.
+- **Bout-en-bout** : AnswerCorrectness, AnswerAccuracy.
 
-### A4. Faithfulness et answer_relevancy
+Besoin d'une référence : ContextPrecision, ContextRecall, AnswerCorrectness, AnswerAccuracy.
 
-- **faithfulness** (`collections.py:153`) : réponse comparée au **contexte**. La réponse est découpée en affirmations, chacune jugée déductible du contexte (1) ou non (0). Score = affirmations déductibles / total. Mesure les hallucinations.
-- **answer_relevancy** (`collections.py:199`) : réponse comparée à la **question**. Le juge génère 3 questions à partir de la réponse ; score = similarité cosinus moyenne avec la vraie question, et 0 si la réponse est évasive. Mesure les réponses à côté.
+### A4. Faithfulness vs answer_relevancy
 
-Aucune des deux n'utilise la référence : elles ne disent pas si la réponse est juste.
+- **faithfulness** compare la réponse au **contexte** : part des affirmations déductibles des chunks. Elle mesure les hallucinations.
+- **answer_relevancy** compare la réponse à la **question** : similarité entre la question et 3 questions régénérées depuis la réponse (0 si la réponse est évasive). Elle mesure les réponses à côté.
 
-- **Bonne relevancy, mauvaise faithfulness : Q04.** La réponse traite bien la question (montant journalier de l'ASA) mais donne 68,50 € au lieu de 64,20 € et invente le cumul avec la PRN.
-- **Bonne faithfulness, mauvaise relevancy :** sur Q01, répondre « l'ALES est réservée aux moins de 26 ans » (ALES#1 est dans le contexte). Tout est fidèle au contexte, mais la réponse ne porte pas sur la PRN. Version atténuée dans les données : Q07 et son paragraphe hors sujet sur le déménagement.
+Exemples : Q04 répond bien à la question mais invente le montant → bonne relevancy, mauvaise faithfulness. Répondre à Q01 (PRN) par « l'ALES est réservée aux moins de 26 ans », tiré d'ALES#1 présent dans le contexte → bonne faithfulness, mauvaise relevancy.
 
 ---
 
@@ -60,100 +44,88 @@ Aucune des deux n'utilise la référence : elles ne disent pas si la réponse es
 
 ### B1. Problèmes relevés
 
-**Bloquants**
+**1. `response` et `reference` inversés — bloquant.**
+`run_eval.py:72` appelle `score_with_ragas(..., expected_response, response)` alors que la signature (`ragas_metrics.py:95`) attend `(..., response, reference)`. Toutes les métriques sauf ContextRelevance reçoivent le mauvais texte : la faithfulness note la référence, le recall juge le contexte par rapport à la réponse générée. Q04 : faithfulness = 1.000 sur une réponse hallucinée (≈ 0.33 attendu, cf. C1).
 
-1. **`response` et `reference` inversés** (`run_eval.py:72` vs signature `ragas_metrics.py:95`). Toutes les métriques sauf ContextRelevance reçoivent le mauvais texte : faithfulness, groundedness et relevancy notent la réponse de référence ; recall et precision jugent le contexte par rapport à la réponse générée. Q04 : faithfulness = 1.000 alors que la réponse est hallucinée (attendu ≈ 0.33, cf. C1). C'est aussi pour ça que le sweep ne voit aucune différence sur Q03.
-2. **Référence vide → chaîne `"None"`** (`run_eval.py:41`, `str(item.expected_output)` ; `dataset_import.py:97` met `None`). Le garde-fou `if not reference` ne se déclenche pas : Q08 est noté contre le texte "None" au lieu d'être exclu (answer_accuracy = 0.0 dans mon run) et tire les moyennes vers le bas.
-3. **ContextPrecision ne suit pas ragas** (`collections.py:299`). On divise par le nombre de chunks au lieu du nombre de chunks pertinents. Q04, verdicts [1, 0, 0, 0] : 0.25 au lieu de 1.0, alors que le chunk utile est classé premier.
+**2. ContextPrecision ne suit pas ragas — bloquant.**
+`collections.py:300` divise par le nombre de chunks au lieu du nombre de chunks pertinents. Q04, verdicts [1, 0, 0, 0] : 0.25 au lieu de 1.0, alors que le seul chunk utile est classé premier. Le score baisse dès qu'on récupère plus de chunks, ce qui biaise tout réglage du retriever.
 
-**Importants**
+**3. `nan` et référence vide mal gérés — important.**
+- `run_eval.py:76` ne filtre que `None`, et `run_report.py:178` moyenne les `nan` : la moyenne de context_recall vaut `nan` sur les 3 runs du sweep (à cause de Q06).
+- `run_eval.py:41` fait `str(item.expected_output)` : une référence vide devient le texte `"None"`, qui passe le garde-fou `if not reference`. Q08 est noté contre "None" au lieu d'être exclu.
 
-4. **Les `nan` ne sont pas filtrés** (`run_eval.py:76` teste seulement `None` ; `run_report.py:76` et `:178`). Un seul `nan` rend la moyenne `nan` : context_recall = nan sur les 3 runs du sweep à cause de Q06 (aucune affirmation dans « Je ne sais pas »). À l'inverse, une métrique qui plante (`None`) sort l'item de la moyenne sans le signaler, et les runs ne sont plus comparés sur les mêmes items.
-5. **Juge = LLM de génération** (`ragas_metrics.py:33-34` lit la section `[Response]`). Le modèle note ses propres réponses : biais d'auto-évaluation, scores optimistes.
-6. **Sweep non contrôlé** (`run_sweep.py:44`, `TEMPERATURE 0.2` sans seed, et `rag_services.py:119`). Q02 a deux variantes de réponse et en tire une au hasard à chaque run : un écart entre deux runs peut venir de la variante tirée et pas de la distance. De plus, le mode `fast` est en dur (`run_sweep.py:167`) : pas de faithfulness, alors que le README la demande dans le rapport.
-7. **Métadonnées de run fausses** (`utils.py`, `get_rag_run_config`). `max_semantic_distance` est lu avec `get_int` : `"0.9"` → exception → 0. Les 3 runs du sweep affichent 0 dans Langfuse ; on ne peut pas savoir lequel est lequel. Les deux clés `glossaire_path` s'écrasent aussi.
-
-**Mineurs**
-
-8. **`expected_retrieved_context` exigé puis jeté** (`dataset_import.py:15` vs `:94`). Les chunks attendus par l'expert ne servent jamais : pas de vrai rappel du retrieval.
-9. **Batchs + sémaphore** (`run_eval.py:197-201`). Chaque batch attend son item le plus lent : plus long, mais sans effet sur les scores.
+Autres points, plus brièvement :
+- le juge est le même LLM que le générateur (`ragas_metrics.py:33-34`) : biais d'auto-évaluation ;
+- `max_semantic_distance` est lu avec `get_int` (`utils.py`) : il vaut 0 dans les métadonnées des 3 runs du sweep ;
+- les chunks attendus (`expected_retrieved_context`) sont exigés à l'import puis jetés (`dataset_import.py:94`).
 
 ### B2. Confiance dans le sweep
 
-Non, en l'état je ne trancherais pas avec ce rapport. Très peu d'items sont affectés par `MAX_SEMANTIC_DISTANCE` et la variance est trop forte ; il faudrait plus d'exemples représentatifs.
-
-- **Les scores sont faux** (B1 n°1). Avec l'inversion, recall et precision jugent le contexte par rapport à la réponse générée. Q03, le cas où la distance compte vraiment (MAJO#0 à 0.91), ne bouge pas entre les runs.
-- **Peu d'items concernés.** Passer de 0.85 à 0.95 ne change le contexte que de Q03 et Q05. La décision repose sur 2 items sur 8, et un item pèse 0.125 dans la moyenne.
-- **Bruit non contrôlé.** `TEMPERATURE 0.2` sans seed (`run_sweep.py:44`) : Q02 tire sa variante au hasard. Un seul run par config, pas d'écart-type : impossible de séparer l'effet de la distance du hasard.
-- **Mode `fast` en dur** (`run_sweep.py:167`) : pas de faithfulness ni de precision, alors que c'est le compromis bruit / rappel qu'on cherche à mesurer. Et en mode `full`, ContextPrecision baisse mécaniquement quand il y a plus de chunks (B1 n°3) : biais vers le seuil le plus strict.
-- **Rapport fragile** : moyenne à `nan` (Q06) et distance enregistrée à 0 pour les 3 runs (B1 n°7).
-
-Pour trancher : corriger les bugs, `TEMPERATURE=0`, mode `full`, mesurer le retrieval directement avec `expected_retrieved_context` (rappel des chunks attendus, sans juge), et regarder Q03 et Q05 au cas par cas plutôt que la moyenne.
+Non.
+- **Scores faux** : à cause de l'inversion, Q03, le seul cas où la distance compte vraiment (MAJO#0 à 0.91), ne bouge pas entre les runs.
+- **Trop peu d'items concernés** : entre 0.85 et 0.95, seuls Q03 et Q05 changent de contexte. La décision repose sur 2 items sur 8, et un item pèse 0.125 dans la moyenne.
+- **Bruit non contrôlé** : `TEMPERATURE 0.2` sans seed (`run_sweep.py:44`). Q02 tire au hasard l'une de ses deux variantes : un écart peut venir de la variante, pas de la distance. Un seul run par config, pas d'écart-type.
+- **Mode `fast` en dur** (`run_sweep.py:167`) : ni faithfulness ni precision.
 
 ### B3. Lancement via l'API
 
-**Le client contrôle la config** (`api_models.py:13-14`, `eval_launcher.py:47`). `config_path` et `config_overrides` sont pris tels quels, sans authentification sur la route (`evaluation_router.py:18`). Un appelant peut rediriger `[Response] SERVER` vers son propre serveur : il reçoit les chunks de la documentation interne et la clé d'API (envoyée par le client LLM dans l'en-tête `Authorization`), et peut renvoyer de fausses notes. Il peut aussi changer `PG_DATABASE` pour viser une autre base.
-
-Correction : liste blanche des clés modifiables (`[Retriever]` uniquement), config de base choisie côté serveur par un identifiant, URL / modèles / base jamais surchargeables, authentification (jeton SSO + rôle) et API limitée au réseau interne.
+`config_path` et `config_overrides` viennent du client sans validation ni authentification (`api_models.py:13-14`, `evaluation_router.py:18`). Un appelant peut rediriger `[Response] SERVER` vers son propre serveur : il reçoit les chunks de la documentation interne et la clé d'API, et peut renvoyer de fausses notes.
+Correction : liste blanche des paramètres modifiables (`[Retriever]`), URL et modèles non surchargeables, authentification.
 
 ---
 
 ## C. Raisonnement sur les données
 
-### C1. Q04, hallucination
+### C1. Q04
 
-**Recalcul** : on retrouve les scores enregistrés.
-- faithfulness : 3 affirmations, 3 verdicts à 1 → 3/3 = **1.000** ;
-- context_precision : verdicts [1, 0, 0, 0] → (1/1 × 1) / 4 chunks = **0.250**.
+On retrouve les scores enregistrés : faithfulness = 3/3 = **1.0** ; context_precision = (1/1 × 1) / 4 = **0.25**.
 
-**Mais ces scores sont faux**, pour deux raisons différentes :
-- **faithfulness** : à cause de l'inversion (`run_eval.py:72`), le juge a découpé la *référence* (64,20 €), pas la réponse générée. Sur la vraie réponse : « 68,50 €/jour » non soutenu, « 22 jours/mois » soutenu par ASA#0, « cumulable avec la PRN » non soutenu (PRN#1 dit même l'inverse) → **1/3 ≈ 0.33** au lieu de 1.0.
-- **context_precision** : l'inversion ne change rien ici (seul ASA#0 est utile dans les deux cas), c'est la formule. On divise par le nombre de chunks au lieu du nombre de chunks utiles (`collections.py:300`). Le seul chunk utile est classé premier → **1.0** au lieu de 0.25.
+Ils sont faux, pour deux raisons différentes :
+- **faithfulness** : le juge a découpé la référence (64,20 €) à cause de l'inversion. Sur la vraie réponse, seule « 22 jours/mois » est soutenue ; 68,50 € et le cumul avec la PRN ne le sont pas → **0.33**.
+- **context_precision** : ici c'est la formule. Le seul chunk utile est en tête → **1.0**.
 
-Lecture correcte : retrieval parfait (le bon chunk en tête), génération qui hallucine. Les scores enregistrés disent l'inverse.
+Les scores disent « bonne génération, mauvais retrieval » ; c'est l'inverse.
 
-### C2. Q05 et Q06, abstentions
+### C2. Q05 et Q06
 
 | Métrique | Q05 (légitime) | Q06 (illégitime) |
 |---|---|---|
-| faithfulness | 0 (0/2) | nan (aucune affirmation) |
-| answer_relevancy | 0 (tout noncommittal) | 0 (tout noncommittal) |
-| context_recall | 0 (0/2) | 1 (3/3) |
-| context_precision | 0 | 0.2 avec le code (1/5), 1.0 avec ragas |
-| answer_accuracy | 1 ((4/4 + 4/4) / 2) | 0 |
+| faithfulness | 0 | nan (aucune affirmation) |
+| answer_relevancy | 0 | 0 |
+| context_recall | 0 | 1 |
+| context_precision | 0 | 0.2 (1.0 avec ragas) |
+| answer_accuracy | 1 | 0 |
 | response_groundedness | 0 | 0 |
-| context_relevance | 0 | 1 ((2/2 + 2/2) / 2) |
+| context_relevance | 0 | 1 |
 
-- **Ce qui distingue les deux cas** : answer_accuracy (1 vs 0), la seule qui juge bien les deux abstentions, car la référence de Q05 dit de s'abstenir. Les métriques de contexte distinguent aussi (0 vs 1), mais elles disent seulement s'il y avait de quoi répondre.
-- **Ce qui pénalise Q05 à tort** : faithfulness, answer_relevancy et response_groundedness valent 0 pour un comportement correct. Toute abstention a 0 en relevancy (`collections.py:232`).
-- **Pour les moyennes** : les abstentions légitimes tirent les métriques de génération vers le bas, et l'abstention illégitime de Q06 donne `nan` en faithfulness : filtrée, elle disparaît de la moyenne. Il faut étiqueter les questions hors périmètre dans le golden dataset, les sortir des moyennes de génération et mesurer l'abstention à part (s'abstient-il quand il faut, et seulement quand il faut ?).
+- **Distinguent les deux cas** : answer_accuracy, la seule qui juge bien les deux, et les métriques de contexte (qui disent seulement s'il y avait de quoi répondre).
+- **Pénalisent Q05 à tort** : faithfulness, answer_relevancy, response_groundedness.
+- **Conclusion** : les abstentions légitimes tirent les moyennes de génération vers le bas, et Q06 (`nan`) disparaît de la moyenne de faithfulness. Il faut taguer les questions hors périmètre et mesurer l'abstention à part.
 
-### C3. Q03, combinaison de deux documents
+### C3. Q03
 
-- **À 0.90** : MAJO#0 (0.91) est coupé. Contexte = CGPE#0, CGPE#1, SITU#0. Le générateur répond 310 €, sans la majoration. faithfulness = 2/2 = **1.0** : il a bien utilisé ce qu'il avait. context_recall = 2/4 = **0.5** : les phrases « majoration de 30 % » et « 403 € » de la référence ne sont pas dans le contexte.
-- **À 0.95** : MAJO#0 entre, mais aussi ASA#1 (0.94, hors sujet). Le générateur répond 403 €. faithfulness = 1.0, context_recall = 4/4 = **1.0**. context_precision baisse avec la formule du code (verdicts [1, 0, 0, 1, 0] → 1.5/5 = 0.3 ; 0.75 avec ragas).
-- **La métrique qui tranche : context_recall.** Faithfulness à 1 et recall à 0.5 : le générateur a fait son travail, c'est le retriever qui n'a pas ramené l'information. Mais avec l'inversion (B1 n°1), le recall est calculé sur la réponse générée → 1.0 aux deux seuils : le problème est invisible.
-- Plus simple et sans juge : comparer aux chunks attendus (`expected_retrieved_context = CGPE#0;MAJO#0`, MAJO#0 absent à 0.90), mais ils ne sont pas importés.
+- **À 0.90**, MAJO#0 (0.91) est coupé. Réponse : 310 €, sans majoration. Faithfulness = **1.0** (le générateur a bien utilisé son contexte), context_recall = 2/4 = **0.5** (la majoration et les 403 € manquent au contexte).
+- **À 0.95**, MAJO#0 entre (avec ASA#1, hors sujet). Réponse : 403 €. Recall = **1.0**.
+- **context_recall** montre que le problème vient du retriever. Mais avec l'inversion, il est calculé sur la réponse générée et vaut 1.0 aux deux seuils.
 
 ---
 
 ## D. Améliorations
 
-### D1. Évolutions, de la plus simple à la plus ambitieuse
+### D1. Évolutions
 
-| # | Évolution | Problème résolu | Effort | Risque |
+| # | Évolution | Problème | Effort | Risque |
 |---|---|---|---|---|
-| 1 | Corriger les bugs bloquants (inversion, `str(None)`, `nan`, ContextPrecision, `get_int`) + tests unitaires | scores faux (B1 n°1 à 4) | < 1 jour | historique incomparable : nouvelle baseline, versionner les métriques |
-| 2 | Métriques de retrieval sans juge sur `expected_retrieved_context` (hit@k, recall@k, MRR) | retrieval jamais comparé aux chunks de l'expert. Q03 : recall@5 = 0.5 à 0.90, 1.0 à 0.95 | 1-2 jours | les identifiants de chunks changent si on re-découpe le corpus |
-| 3 | Traiter les abstentions à part (`source_tag = hors_perimetre`) : taux de refus à tort, taux de réponse hors périmètre, métriques de génération seulement sur les réponses | abstentions qui faussent les moyennes (C2) | 2-3 jours | détection d'abstention imparfaite, peu d'items tagués |
-| 4 | Sweep fiable : température 0, comparaison item par item, intervalle de confiance (bootstrap), identifiants d'items dans le rapport | impossible de trancher (B2) | 3-5 jours | coût des répétitions |
-| 5 | Juge séparé et calibré sur des annotations humaines + golden dataset de 150-300 items stratifiés par type | juge = générateur, 8 items | plusieurs semaines | temps des experts, maintenance quand la réglementation change |
+| 1 | Corriger l'inversion, ContextPrecision, `nan` / `"None"` + tests | scores faux | < 1 jour | historique incomparable : nouvelle baseline |
+| 2 | Recall@k sur `expected_retrieved_context`, sans juge | retrieval jamais comparé à l'attendu | 1-2 jours | ids de chunks instables si on re-découpe |
+| 3 | Abstention mesurée à part (`source_tag = hors_perimetre`) | moyennes faussées (C2) | 2-3 jours | détection d'abstention imparfaite |
+| 4 | Juge séparé + dataset de 150-300 items stratifiés | auto-évaluation, 8 items | semaines | temps des experts |
 
 ### D2. Évolution n°1
 
 ```python
-# run_eval.py:41 : plus de "None" en texte
-expected_response = item.expected_output or None
+# run_eval.py:41
+expected_response = item.expected_output or None          # plus de "None" en texte
 
 # run_eval.py:72 : arguments nommés, l'inversion devient impossible
 scores = await score_with_ragas(metrics, query=prompt, chunks=ctx_texts,
@@ -162,60 +134,36 @@ scores = await score_with_ragas(metrics, query=prompt, chunks=ctx_texts,
 
 # ragas_metrics.py, score_with_ragas
 REFERENCE_METRICS = {"context_precision", "context_recall", "answer_correctness", "answer_accuracy"}
-
 async def run_metric(m):
     if m.name in REFERENCE_METRICS and not sample.reference:
-        return None                       # pas de référence : non applicable
+        return None                                       # non applicable
     async with sem:
         return await call_ascore(m, sample)
 
 value = float(r) if r is not None else None
-if value is not None and math.isnan(value):
-    value = None                          # compté en "manquant" dans le rapport, pas dans la moyenne
-scores[m.name] = value
+scores[m.name] = None if value is None or math.isnan(value) else value
 
 # collections.py:300 : formule ragas
 denominator = sum(verdict_list) + 1e-10
 
-# test
 def test_context_precision():
     assert round(ContextPrecision(llm=None)._calculate_average_precision([1, 0, 0, 0]), 3) == 1.0
 ```
 
 ### D3. Retours utilisateurs
 
-Les retours confirment ce qu'on a trouvé : SITU#1 jugé hors sujet pour une reprise d'emploi (Q07), « le bon montant est là, c'est la réponse qui est fausse » sur ASA#0 (Q04), « il manque la circulaire majoration » (Q03).
+Ils recoupent nos constats : SITU#1 hors sujet (Q07), « le bon montant est là, c'est la réponse qui est fausse » (Q04), « il manque la circulaire majoration » (Q03).
 
-**Exploitation**
-- **Accord juge / humains** : retrouver question et réponse via `message_id`, faire juger le même chunk par le juge (verdict utile / pas utile de ContextPrecision), comparer et calculer un kappa de Cohen.
-- **Enrichir le golden dataset** avec les cas notés négativement (le retour « manquant » donne directement un chunk attendu).
-- **Garder séparés** l'avis sur le chunk (retrieval) et l'avis sur la réponse (génération) : le retour n°5 montre qu'un bon chunk peut aller avec une mauvaise réponse.
-
-**Difficultés**
-- étiquettes libres : `pertinent`, `non_pertinent`, `NON PERTINENT`, `bof`, `manquant` (`eval` en VARCHAR, `document_evaluation.py:45`) ;
-- doublon (lignes 6 et 7) ;
-- `manquant` est un autre signal (chunk absent, pas de `chunk_index`) ;
-- pas de question dans la ligne : jointure obligatoire avec les traces ;
-- biais : seuls les chunks cités sont notés, et on note surtout quand ça ne va pas ;
-- 8 retours, il en faut 100 à 200 pour un kappa fiable ;
-- `chunk_index` change si on re-découpe ;
-- commentaires libres pouvant contenir des données personnelles (RGPD).
+- **Usage** : retrouver la question via `message_id`, faire juger le même chunk par le juge, mesurer l'accord (kappa de Cohen) ; transformer les retours négatifs en nouveaux items du golden dataset.
+- **Difficultés** : étiquettes non normalisées (`non_pertinent`, `NON PERTINENT`, `bof`), doublon (lignes 6 et 7), `manquant` qui n'est pas un avis sur un chunk cité, biais de sélection (seuls les chunks cités sont notés, surtout quand ça va mal), volume trop faible.
 
 ### D4. Intégration
 
-Coût : environ 7 appels au juge par item en `fast`, 20 en `full`.
-
-**(a) CI sur merge request**, seulement si la MR touche au RAG (retriever, prompts, config, modèle) :
-1. tests unitaires des métriques (gratuit, aurait bloqué l'inversion) ;
-2. retrieval sans juge sur tout le dataset (gratuit) ;
-3. 30 à 50 items stratifiés par type, mode `fast`, température 0 (~10 min, quelques centaines d'appels).
-
-Seuils relatifs à la baseline de `main`, calibrés sur le bruit (baseline lancée 5 fois, blocage au-delà de 2 écarts-types). Bloquant dans tous les cas : `nb_error > 0`, baisse du recall des chunks attendus, item critique qui passe de réussi à échoué. Le rapport de la MR liste les items qui ont changé, pas seulement les moyennes.
-
-**(b) Évaluation planifiée**, chaque semaine et à chaque ré-indexation ou changement de modèle : tout le dataset, mode `full`, juge séparé, 3 répétitions, intervalles de confiance, résultats par type de question et matrice d'abstention. C'est là qu'on fait les sweeps. Suivi dans Langfuse avec alertes, et audit mensuel de 20 à 30 jugements par un expert pour détecter une dérive du juge.
+- **CI (merge request touchant au RAG)** : tests unitaires des métriques, recall@k sans juge sur tout le dataset, puis 30-50 items stratifiés en mode `fast`, température 0. Seuils relatifs à la baseline de `main`, calibrés sur le bruit mesuré ; bloquant si `nb_error > 0` ou si un item critique régresse.
+- **Évaluation planifiée (hebdomadaire, et à chaque ré-indexation ou changement de modèle)** : tout le dataset en mode `full`, juge séparé, plusieurs répétitions, résultats par type de question. C'est là qu'on fait les sweeps.
 
 ---
 
 ## Usage de l'IA
 
-Claude (Claude Code) : aide à la compréhension du code, vérification des calculs à partir des traces, reformulation et mise en forme des réponses.
+Claude  Code m'a aidé à la compréhension du code, vérification des calculs à partir des traces, reformulation et mise en forme des réponses.
