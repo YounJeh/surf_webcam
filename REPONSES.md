@@ -126,3 +126,78 @@ C3. Q03 (voir data/README.md) demande de combiner deux documents. Que se passe-t
 - **À 0.95** : MAJO#0 entre, mais aussi ASA#1 (0.94, hors sujet). Le générateur répond 403 €. faithfulness = 1.0, context_recall = 4/4 = **1.0**. context_precision baisse avec la formule du code (verdicts [1, 0, 0, 1, 0] → 1.5/5 = 0.3 ; 0.75 avec ragas).
 - **La métrique qui tranche : context_recall.** Faithfulness à 1 + recall à 0.5 = le générateur a fait son travail, c'est le retriever qui n'a pas ramené l'info. Mais avec l'inversion (B1 n°1), le recall est calculé sur la réponse générée → 1.0 aux deux seuils : le problème est invisible.
 - Plus simple et sans juge : comparer aux chunks attendus `expected_retrieved_context = CGPE#0;MAJO#0` (MAJO#0 absent à 0.90), mais ils ne sont pas importés.
+
+D1. Évolutions, de la plus simple à la plus ambitieuse
+
+| # | évolution | problème résolu | effort | risque |
+|---|---|---|---|---|
+| 1 | Corriger les bugs bloquants (inversion, `str(None)`, `nan`, ContextPrecision, `get_int`) + tests unitaires | scores faux (B1 n°1-4) | < 1 jour | historique incomparable : nouvelle baseline, versionner les métriques |
+| 2 | Métriques de retrieval sans juge sur `expected_retrieved_context` (hit@k, recall@k, MRR) | retrieval jamais comparé aux chunks de l'expert. Q03 : recall@5 = 0.5 à 0.90, 1.0 à 0.95 | 1-2 jours | les ids de chunks changent si on re-découpe le corpus |
+| 3 | Traiter les abstentions à part (`source_tag = hors_perimetre`) : taux de refus à tort, taux de réponse hors périmètre, métriques de génération seulement sur les réponses | abstentions qui faussent les moyennes (C2) | 2-3 jours | détection d'abstention imparfaite, peu d'items tagués |
+| 4 | Sweep fiable : température 0, comparaison item par item, intervalle de confiance (bootstrap), ids d'items dans le rapport | impossible de trancher (B2) | 3-5 jours | coût des répétitions |
+| 5 | Juge séparé et calibré sur des annotations humaines + golden dataset de 150-300 items stratifiés par type | juge = générateur, 8 items | plusieurs semaines | temps des experts, maintenance quand la réglementation change |
+
+D2. Évolution n°1
+
+```python
+# run_eval.py:41 : plus de "None" en texte
+expected_response = item.expected_output or None
+
+# run_eval.py:72 : arguments nommés, l'inversion devient impossible
+scores = await score_with_ragas(metrics, query=prompt, chunks=ctx_texts,
+                                response=response, reference=expected_response,
+                                max_concurrency=metrics_concurrency)
+
+# ragas_metrics.py, score_with_ragas
+REFERENCE_METRICS = {"context_precision", "context_recall", "answer_correctness", "answer_accuracy"}
+
+async def run_metric(m):
+    if m.name in REFERENCE_METRICS and not sample.reference:
+        return None                       # pas de référence : non applicable
+    async with sem:
+        return await call_ascore(m, sample)
+
+value = float(r) if r is not None else None
+if value is not None and math.isnan(value):
+    value = None                          # compté en "manquant" dans le rapport, pas dans la moyenne
+scores[m.name] = value
+
+# collections.py:300 : formule ragas
+denominator = sum(verdict_list) + 1e-10
+
+# test
+def test_context_precision():
+    assert round(ContextPrecision(llm=None)._calculate_average_precision([1, 0, 0, 0]), 3) == 1.0
+```
+
+D3. Retours utilisateurs
+
+Les retours confirment ce qu'on a trouvé : SITU#1 jugé hors sujet pour une reprise d'emploi (Q07), « le bon montant est là, c'est la réponse qui est fausse » sur ASA#0 (Q04), « il manque la circulaire majoration » (Q03).
+
+Exploitation :
+- **accord juge / humains** : retrouver question et réponse via `message_id`, faire juger le même chunk par le juge (verdict utile / pas utile de ContextPrecision), comparer et calculer un kappa de Cohen ;
+- **enrichir le golden dataset** avec les cas notés négativement (le retour « manquant » donne directement un chunk attendu) ;
+- **garder séparés** l'avis sur le chunk (retrieval) et l'avis sur la réponse (génération) : le retour n°5 montre qu'un bon chunk peut aller avec une mauvaise réponse.
+
+Difficultés :
+- étiquettes libres : `pertinent`, `non_pertinent`, `NON PERTINENT`, `bof`, `manquant` (`eval` en VARCHAR, `document_evaluation.py:45`) ;
+- doublon (lignes 6 et 7) ;
+- `manquant` est un autre signal (chunk absent, pas de `chunk_index`) ;
+- pas de question dans la ligne, jointure obligatoire avec les traces ;
+- biais : seuls les chunks cités sont notés, et on note surtout quand ça ne va pas ;
+- 8 retours, il en faut 100-200 pour un kappa fiable ;
+- `chunk_index` change si on re-découpe ;
+- commentaires libres qui peuvent contenir des données personnelles (RGPD).
+
+D4. Intégration
+
+Coût : environ 7 appels au juge par item en `fast`, 20 en `full`.
+
+**(a) CI sur merge request**, seulement si la MR touche au RAG (retriever, prompts, config, modèle) :
+1. tests unitaires des métriques (gratuit, aurait bloqué l'inversion) ;
+2. retrieval sans juge sur tout le dataset (gratuit) ;
+3. 30-50 items stratifiés par type, mode `fast`, température 0 (~10 min, quelques centaines d'appels).
+
+Seuils relatifs à la baseline de `main`, calibrés sur le bruit (baseline lancée 5 fois, blocage au-delà de 2 écarts-types). Bloquant dans tous les cas : `nb_error > 0`, baisse du recall des chunks attendus, item critique qui passe de réussi à échoué. Le rapport de la MR liste les items qui ont changé, pas seulement les moyennes.
+
+**(b) Évaluation planifiée**, chaque semaine et à chaque ré-indexation ou changement de modèle : tout le dataset, mode `full`, juge séparé, 3 répétitions, intervalles de confiance, résultats par type de question et matrice d'abstention. C'est là qu'on fait les sweeps. Suivi dans Langfuse avec alerte, et audit mensuel de 20-30 jugements par un expert pour détecter une dérive du juge.
